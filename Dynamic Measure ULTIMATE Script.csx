@@ -3,7 +3,7 @@ using Microsoft.VisualBasic;
 
 // by Johnny Winter
 // www.greyskullanalytics.com
-// '2021-10-15 / B.Agullo / dynamic parameters by B.Ag'2021-10-15 / B.Agullo / 
+// '2021-10-15 / B.Agullo / dynamic parameters by B.Agullo / 
 
 // Instructions:
 //select the measures you want to add to your Dynamic Measure and then run this script (or store it as macro)
@@ -20,6 +20,9 @@ if (Selected.Measures.Count == 0) {
 string calcGroupName = Interaction.InputBox("Provide a name for your Calc Group", "Calc Group Name", "Dynamic Measure", 740, 400);
 if(calcGroupName == "") return;
 
+string columnName = Interaction.InputBox("Calc Group column name", "Column Name", calcGroupName, 740, 400);
+if(columnName == "") return;
+
 //check to see if a table with this name already exists
 //if it doesnt exist, create a calculation group with this name
 if (!Model.Tables.Contains(calcGroupName)) {
@@ -35,10 +38,9 @@ if (calcGroup.SourceType.ToString() != "CalculationGroup") {
   return;
 };
 
-string columnName = Interaction.InputBox("Calc Group column name", "Column Name", calcGroupName, 740, 400);
-if(columnName == "") return;
 
-string measureName = Interaction.InputBox("Dynamic Measure Name", "Measure Name", "Dynamic Measure", 740, 400);
+
+string measureName = Interaction.InputBox("Dynamic Measure Name (cannot be named \"" + columnName +"\")", "Measure Name", "Placeholder for Dynamic Measure", 740, 400);
 if(measureName == "") return;
 
 string switchSuffix = Interaction.InputBox("suffix for the SWITCH dynamic measure", "Suffix for switch", "SWITCH", 740, 400);
@@ -77,7 +79,8 @@ foreach(var cg in Model.CalculationGroups) {
       if (!cg.CalculationItems.Contains(m.Name)) {
         var newCalcItem = cg.AddCalculationItem(
         m.Name, "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ), " + "[" + m.Name + "], " + "SELECTEDMEASURE() )");
-        newCalcItem.FormatStringExpression = "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ),\"" + m.FormatString + "\", SELECTEDMEASUREFORMATSTRING() )";
+        // '2021-10-15 / B.Agullo / double quotes in format string need to be doubled to be preserved
+        newCalcItem.FormatStringExpression = "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ),\"" + m.FormatString.Replace("\"","\"\"") + "\", SELECTEDMEASUREFORMATSTRING() )";
         newCalcItem.FormatDax();
       };
     };
@@ -125,7 +128,7 @@ foreach(var cg in Model.CalculationGroups) {
                   formatString = m.FormatString;
               };
           }; 
-          formattedItemList = formattedItemList + "\"" + ci.Name + "\", FORMAT( [" + ci.Name + "], \"" + formatString + "\"),";
+          formattedItemList = formattedItemList + "\"" + ci.Name + "\", FORMAT( [" + ci.Name + "], \"" + formatString.Replace("\"","\"\"") + "\"),";
       };
     };
 };
