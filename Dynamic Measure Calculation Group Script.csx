@@ -1,28 +1,25 @@
 // by Johnny Winter
 // www.greyskullanalytics.com
 
-//select the measures you want to add to your Dynamic Measure and then run this script
-//change the next 4 string variables for different naming conventions
-
-//add the name of your calculation group here
-string calcGroupName = "@Dynamic Measure";
-
-//add the name for the column you want to appear in the calculation group
-string columnName = "Measure Selection";
-
-//add the name of the dynamic measure here
-string measureName = "Dynamic Measure";
-
-//create a default value for the dynamic measure. 
-string measureDefault = "BLANK()";
-//
-// ----- do not modify script below this line -----
-//
+#r "Microsoft.VisualBasic"
+using Microsoft.VisualBasic;
 
 if (Selected.Measures.Count == 0) {
   Error("Select one or more measures");
   return;
 }
+//select the measures you want to add to your Dynamic Measure and then run this script
+//change the next 4 string variables for different naming conventions
+
+
+
+//add the name of your calculation group here
+string calcGroupName = Interaction.InputBox("Provide a name for your Calculation Group", "Calculation Group Name", "@Dynamic Measure", 740, 400);
+if(calcGroupName == "") return;
+
+//add the name for the column you want to appear in the calculation group
+string columnName = Interaction.InputBox("Provide a name for the Calculation Group measure selection column", "Column Name", "Measure Selection", 740, 400);
+if(columnName == "") return;
 
 //check to see if a table with this name already exists
 //if it doesnt exist, create a calculation group with this name
@@ -38,6 +35,14 @@ if (calcGroup.SourceType.ToString() != "CalculationGroup") {
   Error("Table exists in Model but is not a Calculation Group. Rename the existing table or choose an alternative name for your Calculation Group.");
   return;
 };
+
+//add the name of the dynamic measure here
+string measureName = Interaction.InputBox("Provide a name for the Dynamic Measure", "Dynamic Measure Name", "Dynamic Measure", 740, 400);
+if(measureName == "") return;
+
+//create a default value for the dynamic measure. 
+string measureDefault = "BLANK()";
+
 //by default the calc group has a column called Name. If this column is still called Name change this in line with specfied variable
 if (calcGroup.Columns.Contains("Name")) {
   calcGroup.Columns["Name"].Name = columnName;
@@ -68,4 +73,3 @@ foreach(var cg in Model.CalculationGroups) {
     };
   };
 };
-
