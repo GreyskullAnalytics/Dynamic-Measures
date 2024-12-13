@@ -68,7 +68,7 @@ foreach(var cg in Model.CalculationGroups) {
       if (!cg.CalculationItems.Contains(m.Name)) {
         var newCalcItem = cg.AddCalculationItem(
         m.Name, "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ), " + "[" + m.Name + "], " + "SELECTEDMEASURE() )");
-        newCalcItem.FormatStringExpression = "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ),\"" + m.FormatString + "\", SELECTEDMEASUREFORMATSTRING() )";
+        newCalcItem.FormatStringExpression = "IF ( " + "ISSELECTEDMEASURE ( [" + measureName + "] ),\"" + m.FormatString.Replace('\"', '\'') + "\", SELECTEDMEASUREFORMATSTRING() )";
       };
     };
   };
